@@ -1,9 +1,11 @@
 export const FETCH_BREWERIES = 'FETCH_BREWERIES';
 export const FETCH_SUCCESS = 'FETCH_SUCCESS';
 export const FETCH_FAIL = 'FETCH_FAIL';
+export const GO_TO_PAGE = 'GO_TO_PAGE';
 
 const initialState = {
 	breweries: [],
+	page: 1,
 	isFetching: false,
 	error: '',
 };
@@ -26,6 +28,11 @@ export const breweriesReducer = (state = initialState, action) => {
 				...state,
 				isFetching: false,
 				error: action.payload,
+			};
+		case GO_TO_PAGE:
+			return {
+				...state,
+				page: action.payload,
 			};
 		default:
 			return state;

@@ -53,7 +53,7 @@ const BreweryDetails = () => {
 		return (
 			<>
 				<p>Error loading brewery data</p>
-				<p>{error}</p>
+				<p>{error.message}</p>
 			</>
 		);
 	}

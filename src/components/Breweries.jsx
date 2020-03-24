@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { useStateValue } from 'react-conflux';
 import axios from 'axios';
+import { makeStyles } from '@material-ui/core/styles';
+import Pagination from '@material-ui/lab/Pagination';
 
 // local imports
 import Brewery from './Brewery';
@@ -9,18 +11,31 @@ import {
 	FETCH_BREWERIES,
 	FETCH_SUCCESS,
 	FETCH_FAIL,
+	GO_TO_PAGE,
 } from '../reducers/breweriesReducer';
 
+// Styles
+const useStyles = makeStyles(theme => ({
+	root: {
+		'& > *': {
+			marginTop: theme.spacing(2),
+		},
+	},
+}));
+
 const Breweries = () => {
-	const [{ isFetching, breweries, error }, dispatch] = useStateValue(
+	const classes = useStyles();
+	const [{ isFetching, breweries, error, page }, dispatch] = useStateValue(
 		breweriesContext
 	);
 
 	console.log('breweries state', breweries);
-	const fetchBreweries = async () => {
+	const fetchBreweries = async page => {
 		dispatch({ type: FETCH_BREWERIES });
 		try {
-			const res = await axios.get('https://api.openbrewerydb.org/breweries');
+			const res = await axios.get(
+				`https://api.openbrewerydb.org/breweries?page=${page}`
+			);
 			console.log(res);
 			dispatch({ type: FETCH_SUCCESS, payload: res.data });
 		} catch (err) {
@@ -29,9 +44,14 @@ const Breweries = () => {
 		}
 	};
 
+	const handlePages = (e, page) => {
+		e.preventDefault();
+		dispatch({ type: GO_TO_PAGE, payload: page });
+	};
+
 	useEffect(() => {
-		fetchBreweries();
-	}, []);
+		fetchBreweries(page);
+	}, [page]);
 
 	if (isFetching) {
 		return (
@@ -55,6 +75,15 @@ const Breweries = () => {
 			{breweries.map(brewery => (
 				<Brewery key={brewery.id} data={brewery} />
 			))}
+			<div className={classes.root}>
+				<Pagination
+					count={50}
+					page={page}
+					shape="rounded"
+					onChange={handlePages}
+					color={'primary'}
+				/>
+			</div>
 		</>
 	);
 };
